@@ -1,0 +1,240 @@
+# Create index.html file with the previously generated SEO-friendly page so the user can upload it to GitHub Pages.
+html_content = """<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Czas pracy w Polsce – zasady, nadgodziny, praca nocna + kalkulator</title>
+  <meta name="description" content="Kompletny przewodnik po czasie pracy w Polsce: normy dobowo‑tygodniowe, systemy i rozkłady, nadgodziny, praca w nocy, w niedziele i święta, ewidencja oraz odpoczynki. Wbuduj swój kalkulator czasu pracy." />
+  <link rel="canonical" href="https://twojadomena.pl/czas-pracy" />
+  <meta name="theme-color" content="#0b5cff" />
+  
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Czas pracy w Polsce – zasady, nadgodziny, praca nocna + kalkulator" />
+  <meta property="og:description" content="Kompletny przewodnik po czasie pracy, wraz z miejscem na Twój kalkulator." />
+  <meta property="og:url" content="https://twojadomena.pl/czas-pracy" />
+  <meta property="og:image" content="https://twojadomena.pl/og-czas-pracy.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0b1220; --muted:#5b667a; --brand:#0b5cff; --brand-2:#ebf2ff; --card:#f7f9fd;
+      --max: 1100px; --radius: 16px;
+    }
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.7 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    a{color:var(--brand);text-decoration:none}
+    a:hover{text-decoration:underline}
+    header{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid #e9eef9;z-index:10}
+    .wrap{max-width:var(--max);margin:auto;padding:16px 20px}
+    .brand{display:flex;gap:10px;align-items:center;font-weight:700}
+    .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--brand)}
+    nav{display:flex;gap:18px;align-items:center}
+    .grid{display:grid;grid-template-columns: 280px 1fr;gap:28px}
+    @media (max-width:960px){.grid{grid-template-columns:1fr}.toc{position:static}}
+    main{padding:28px 20px}
+    .hero{background:linear-gradient(180deg, var(--brand-2), #fff 55%);border-bottom:1px solid #e9eef9}
+    .hero h1{font-size:clamp(26px, 4vw, 44px);line-height:1.15;margin:0 0 8px}
+    .hero p{color:var(--muted);margin:0}
+    .toc{position:sticky;top:76px;align-self:start;background:#fff;border:1px solid #e9eef9;border-radius:var(--radius);padding:16px}
+    .toc h3{margin:0 0 8px;font-size:14px;letter-spacing:.02em;text-transform:uppercase;color:#344055}
+    .toc a{display:block;padding:6px 0;color:#32405a}
+    article{background:#fff;border:1px solid #e9eef9;border-radius:var(--radius);padding:24px}
+    article h2{margin-top:28px}
+    .card{background:var(--card);border:1px solid #e2e8f6;border-radius:var(--radius);padding:20px}
+    .note{font-size:14px;color:var(--muted)}
+    .faq details{background:#fff;border:1px solid #e9eef9;border-radius:12px;padding:14px 16px;margin:10px 0}
+    .faq summary{font-weight:600;cursor:pointer}
+    footer{border-top:1px solid #e9eef9;color:var(--muted)}
+    code{background:#f1f5ff;border:1px solid #e2e8f6;padding:.2em .4em;border-radius:8px}
+  </style>
+
+  <!-- Article Schema.org (JSON‑LD) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":"Czas pracy w Polsce – zasady, nadgodziny, praca nocna",
+    "inLanguage":"pl-PL",
+    "author":{"@type":"Person","name":"Twoje Imię"},
+    "publisher":{"@type":"Organization","name":"Twoja Firma","logo":{"@type":"ImageObject","url":"https://twojadomena.pl/logo.png"}},
+    "datePublished":"2025-08-11",
+    "dateModified":"2025-08-11",
+    "image":"https://twojadomena.pl/og-czas-pracy.jpg",
+    "mainEntityOfPage":"https://twojadomena.pl/czas-pracy",
+    "description":"Kompletny przewodnik po czasie pracy w Polsce: normy, systemy, nadgodziny i praca nocna."
+  }
+  </script>
+
+  <!-- FAQ Schema.org (JSON‑LD) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"FAQPage",
+    "mainEntity":[
+      {"@type":"Question","name":"Jaka jest podstawowa norma czasu pracy?","acceptedAnswer":{"@type":"Answer","text":"Co do zasady 8 godzin na dobę i przeciętnie 40 godzin w przeciętnie pięciodniowym tygodniu pracy, w przyjętym okresie rozliczeniowym."}},
+      {"@type":"Question","name":"Kiedy powstają nadgodziny?","acceptedAnswer":{"@type":"Answer","text":"Gdy dojdzie do przekroczenia norm dobowych lub przeciętnej tygodniowej normy w okresie rozliczeniowym."}},
+      {"@type":"Question","name":"Co to jest pora nocna?","acceptedAnswer":{"@type":"Answer","text":"Ośmiogodzinny przedział między 21:00 a 7:00 wyznaczony w regulacjach zakładowych (najczęściej 22:00–6:00)."}},
+      {"@type":"Question","name":"Czy można pracować w niedziele i święta?","acceptedAnswer":{"@type":"Answer","text":"Tak, w przypadkach przewidzianych prawem. Pracownikowi przysługuje inny dzień wolny albo dodatek, w zależności od okoliczności."}}
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+      <div class="brand"><span class="dot"></span> <span>Twoja Marka</span></div>
+      <nav>
+        <a href="#kalkulator">Kalkulator</a>
+        <a href="#faq">FAQ</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <h1>Czas pracy w Polsce: zasady, normy, nadgodziny i praca nocna</h1>
+      <p>Przewodnik dla pracowników i pracodawców + miejsce na Twój własny kalkulator.</p>
+    </div>
+  </section>
+
+  <main class="wrap grid">
+    <aside class="toc" aria-label="Spis treści">
+      <h3>Spis treści</h3>
+      <nav>
+        <a href="#normy">1. Normy czasu pracy</a>
+        <a href="#okresy">2. Okresy rozliczeniowe</a>
+        <a href="#systemy">3. Systemy i rozkłady</a>
+        <a href="#nadgodziny">4. Nadgodziny i dodatki</a>
+        <a href="#noc">5. Praca w nocy</a>
+        <a href="#niedziele">6. Niedziele i święta</a>
+        <a href="#ewidencja">7. Ewidencja i odpoczynki</a>
+        <a href="#kalkulator">8. Kalkulator czasu pracy</a>
+        <a href="#faq">9. Najczęstsze pytania</a>
+      </nav>
+    </aside>
+
+    <article itemscope itemtype="https://schema.org/Article">
+      <section id="intro" class="card" style="margin-bottom:18px">
+        <p><strong>W skrócie:</strong> podstawowa norma to 8 h na dobę i przeciętnie 40 h tygodniowo w przeciętnie 5‑dniowym tygodniu pracy. Od tej zasady istnieją wyjątki wynikające z systemu pracy, organizacji czasu oraz szczególnych okoliczności (np. akcje ratownicze).</p>
+        <p class="note">Uwaga: to opracowanie ma charakter informacyjny i nie stanowi porady prawnej. Sprawdź też wewnętrzne regulacje (układ zbiorowy/regulamin pracy).</p>
+      </section>
+
+      <h2 id="normy">1. Normy czasu pracy</h2>
+      <p>Co do zasady maksymalna <em>dobowa</em> norma wynosi 8 godzin, a <em>tygodniowa</em> – przeciętnie 40 godzin w przeciętnie pięciodniowym tygodniu pracy, mieszcząc się w przyjętym okresie rozliczeniowym. W indywidualnych sytuacjach prawo przewiduje odmienne limity (np. przy pracach szczególnie niebezpiecznych lub przy młodocianych).</p>
+
+      <h2 id="okresy">2. Okresy rozliczeniowe</h2>
+      <p>Okres rozliczeniowy to przedział, w którym rozlicza się czas pracy i nadgodziny. Standardowo do 4 miesięcy, ale przepisy dopuszczają wydłużenie (np. w rolnictwie, transporcie czy przy pracach uzależnionych od pory roku). Wydłużenie wymaga uzasadnienia i uregulowania w przepisach zakładowych.</p>
+
+      <h2 id="systemy">3. Systemy i rozkłady czasu pracy</h2>
+      <ul>
+        <li><strong>Podstawowy</strong> – praca do 8 h na dobę, przeciętnie 5 dni w tygodniu.</li>
+        <li><strong>Równoważny</strong> – do 12 h (a w określonych przypadkach 16/24 h) na dobę z odpowiednim skróceniem czasu w innych dniach.</li>
+        <li><strong>Zadaniowy</strong> – rozliczenie przez wykonanie zadań, z poszanowaniem norm odpoczynku.</li>
+        <li><strong>Przerywany</strong> – jedna przerwa wliczana lub niewliczana według zasad określonych w przepisach zakładowych.</li>
+        <li><strong>Skrócony tydzień / praca weekendowa</strong> – rozwiązania elastyczne, ustalane umownie.</li>
+      </ul>
+
+      <h2 id="nadgodziny">4. Nadgodziny i dodatki</h2>
+      <p>Nadgodziny powstają przy przekroczeniu norm dobowych lub przeciętnej tygodniowej w okresie rozliczeniowym. Co do zasady obowiązują limity roczne oraz dodatki do wynagrodzenia albo czas wolny. Typowe dodatki: <strong>50%</strong> lub <strong>100%</strong> (np. w nocy, niedziele i święta lub poza harmonogramem – zgodnie z regulacjami).</p>
+
+      <h2 id="noc">5. Praca w nocy</h2>
+      <p>Pora nocna obejmuje 8 następujących po sobie godzin między 21:00 a 7:00 (najczęściej 22:00–6:00). Pracownikowi przysługuje dodatek za każdą godzinę pracy w nocy, a dodatkowo występują ograniczenia dla pracownic w ciąży czy młodocianych.</p>
+
+      <h2 id="niedziele">6. Praca w niedziele i święta</h2>
+      <p>Praca w niedziele i święta jest dopuszczalna m.in. w systemach ciągłych, transporcie, gastronomii i służbach – z obowiązkiem zapewnienia dnia wolnego w innym terminie lub dodatku zgodnie z przepisami.</p>
+
+      <h2 id="ewidencja">7. Ewidencja i odpoczynki</h2>
+      <ul>
+        <li><strong>Odpoczynek dobowy:</strong> minimum 11 godzin nieprzerwanie w każdej dobie.</li>
+        <li><strong>Odpoczynek tygodniowy:</strong> co do zasady 35 godzin, obejmujący 11 godzin odpoczynku dobowego.</li>
+        <li><strong>Ewidencja czasu pracy:</strong> obowiązkowa, prowadzona przez pracodawcę dla każdego pracownika.</li>
+      </ul>
+
+      <h2 id="kalkulator">8. Kalkulator czasu pracy</h2>
+      <div class="card">
+        <p><strong>Tu podepniesz swój kalkulator.</strong> Masz dwie proste opcje integracji:</p>
+        <ol>
+          <li><strong>Wklejenie skryptu</strong> – poniżej znajduje się kontener <code>&lt;div id="moj-kalkulator"&gt;</code>. Załaduj swój skrypt (lokalnie lub z CDN) i wywołaj funkcję renderującą.</li>
+          <li><strong>Iframe</strong> – osadź kalkulator jako osobną stronę (<code>&lt;iframe src="/kalkulator/index.html" ...&gt;</code>).</li>
+        </ol>
+        <div id="moj-kalkulator" style="background:#fff;border:1px dashed #cdd7f0;border-radius:12px;padding:16px;min-height:120px;display:flex;align-items:center;justify-content:center;margin-top:10px">
+          <em>Kontener na kalkulator – wklej swój kod poniżej w &lt;script&gt; lub podłącz iframe.</em>
+        </div>
+      </div>
+
+      <section id="faq" class="faq">
+        <h2>9. Najczęstsze pytania</h2>
+        <details>
+          <summary>Jak liczyć przeciętny tygodniowy wymiar czasu pracy?</summary>
+          <div>Sumujesz zaplanowane godziny w okresie rozliczeniowym i dzielisz przez liczbę tygodni; porównujesz z 40 h. Odchylenia kompensujesz planem lub rozliczasz dodatkami/czasem wolnym.</div>
+        </details>
+        <details>
+          <summary>Co z przerwami w pracy?</summary>
+          <div>Po 6 h pracy przysługuje co najmniej 15‑minutowa przerwa (wliczana do czasu pracy). W regulaminach można przewidzieć dodatkowe przerwy.</div>
+        </details>
+        <details>
+          <summary>Czy zadaniowy czas pracy wyłącza nadgodziny?</summary>
+          <div>Nie. Jeśli nałożone zadania obiektywnie nie mieszczą się w normach, mogą powstać nadgodziny.</div>
+        </details>
+      </section>
+
+      <section id="kontakt" class="card" style="margin-top:24px">
+        <h2>Kontakt</h2>
+        <p>Masz pytania lub chcesz dostosować kalkulator? Napisz na: <a href="mailto:kontakt@twojadomena.pl">kontakt@twojadomena.pl</a></p>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:22px 20px">
+      <div>© <span id="y"></span> Twoja Firma. Wszelkie prawa zastrzeżone.</div>
+      <div class="note">Ten serwis korzysta z plików cookies wyłącznie w celach funkcjonalnych.</div>
+    </div>
+  </footer>
+
+  <!-- === INTEGRACJA KALKULATORA ===
+    1) Jeśli masz gotowy bundel JS (np. dist/kalkulator.js), podłącz go i wywołaj render:
+       <script src="/dist/kalkulator.js"></script>
+       <script>
+         window.renderKalkulator?.({ mount: document.getElementById('moj-kalkulator') })
+       </script>
+
+    2) Jeśli kalkulator jest osobną stroną, użyj iframe (odkomentuj i podmień src):
+       <div style="margin-top:12px">
+         <iframe src="/kalkulator/index.html" title="Kalkulator czasu pracy" width="100%" height="680" style="border:1px solid #e2e8f6;border-radius:12px"></iframe>
+       </div>
+  === -->
+
+  <script>
+    // Rok w stopce
+    document.getElementById('y').textContent = new Date().getFullYear()
+
+    // Przykładowy fallback, gdybyś chciał szybko zobaczyć placeholder kalkulatora
+    ;(function(){
+      const m = document.getElementById('moj-kalkulator')
+      if(!m) return
+      const btn = document.createElement('button')
+      btn.textContent = 'Załaduj mój kalkulator (podmień na swój kod)'
+      btn.style.cssText = 'padding:10px 14px;border-radius:12px;border:1px solid #cdd7f0;background:#0b5cff;color:#fff;cursor:pointer;font-weight:600'
+      btn.addEventListener('click', ()=>{
+        m.innerHTML = '<p style="margin:0">[Tu wstrzyknij UI kalkulatora. Zamień ten placeholder na własny render.]</p>'
+      })
+      m.appendChild(btn)
+    })()
+  </script>
+</body>
+</html>
+"""
+with open("/mnt/data/index.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+# Create a zip archive with the index.html for easy upload
+import zipfile, os
+zip_path = "/mnt/data/czas-pracy-site.zip"
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    z.write("/mnt/data/index.html", arcname="index.html")
+
+zip_path, "/mnt/data/index.html"
