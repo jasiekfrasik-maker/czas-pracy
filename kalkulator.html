@@ -1,21 +1,382 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulator czasu pracy</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kalkulator wynagrodzeń – UoP i Zlecenie (PL)</title>
+  <meta name="description" content="Kalkulator wynagrodzeń dla umowy o pracę i umowy zlecenia. Oblicza składki ZUS, zdrowotną, zaliczkę PIT, PPK, brutto/netto.">
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0b1220; --muted:#5b667a; --brand:#0b5cff; --card:#f7f9fd; --soft:#e9eef9;
+      --r:16px; --gap:16px; --max: 1100px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.7 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    a{color:var(--brand);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:var(--max);margin:auto;padding:20px}
+    h1{font-size:clamp(22px,3.4vw,40px);line-height:1.15;margin:0 0 10px}
+    .note{color:var(--muted);font-size:14px}
+
+    .tabs{display:flex;gap:8px;margin-top:14px}
+    .tab{padding:10px 14px;border:1px solid var(--soft);border-bottom:none;border-radius:12px 12px 0 0;background:#ebf2ff;cursor:pointer;font-weight:600}
+    .tab.active{background:#fff;border-bottom:1px solid #fff}
+    .pane{border:1px solid var(--soft);border-radius:0 12px 12px 12px;padding:16px;background:#fff}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+
+    .card{background:var(--card);border:1px solid #e2e8f6;border-radius:var(--r);padding:16px}
+    .row{display:grid;grid-template-columns: 240px 1fr;gap:12px;align-items:center}
+    .row + .row{margin-top:10px}
+    label{font-weight:600}
+    input[type="text"], input[type="number"], select{width:100%;padding:10px 12px;border:1px solid #cdd7f0;border-radius:12px}
+    .checks{display:flex;gap:14px;flex-wrap:wrap}
+    .radios{display:flex;gap:14px;flex-wrap:wrap}
+    .hint{font-size:12px;color:var(--muted)}
+
+    .results{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-top:16px}
+    @media (max-width: 980px){.results{grid-template-columns:1fr}}
+    .box{background:#fff;border:1px solid var(--soft);border-radius:var(--r);padding:14px}
+    .box h3{margin:0 0 10px}
+    .kv{display:flex;justify-content:space-between;border-bottom:1px dashed #eaeef7;padding:6px 0}
+    .kv:last-child{border-bottom:none}
+
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1px solid var(--brand);background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+    .right{display:flex;justify-content:flex-end}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#ebf2ff;border:1px solid #cdd7f0;font-size:12px;margin-left:6px}
+  </style>
 </head>
 <body>
-<main>
-<h2>Kalkulator czasu pracy</h2>
-<div id="kalkulator"></div>
+  <div class="wrap">
+    <h1>Kalkulator wynagrodzeń – UoP i Zlecenie</h1>
+    <p class="note">Wersja web (JS). Dane i wzory przeniesione z wersji tkinter/ttkbootstrap.</p>
+
+    <div class="tabs">
+      <button class="tab active" id="tab-uop" type="button">Umowa o pracę</button>
+      <button class="tab" id="tab-zlec" type="button">Umowa zlecenie</button>
+    </div>
+    <div class="pane" id="pane-uop"></div>
+    <div class="pane" id="pane-zlec" style="display:none"></div>
+
+    <div class="right" style="margin-top:16px">
+      <button id="btn-calc" class="btn" type="button">Oblicz wynagrodzenie</button>
+    </div>
+
+    <div class="results">
+      <div class="box">
+        <h3>Potrącenia</h3>
+        <div class="kv"><span>Składka emerytalna</span><strong id="r-em">0,00 zł</strong></div>
+        <div class="kv"><span>Składka rentowa</span><strong id="r-re">0,00 zł</strong></div>
+        <div class="kv"><span>Składka chorobowa</span><strong id="r-ch">0,00 zł</strong></div>
+        <div class="kv"><span>Składka PPK</span><strong id="r-ppk">0,00 zł</strong></div>
+        <div class="kv"><span>Składka zdrowotna</span><strong id="r-zd">0,00 zł</strong></div>
+        <div class="kv"><span><strong>Suma potrąceń</strong></span><strong id="r-sum">0,00 zł</strong></div>
+      </div>
+      <div class="box">
+        <h3>Podsumowanie</h3>
+        <div class="kv"><span>Przychód (brutto)</span><strong id="r-brutto">0,00 zł</strong></div>
+        <div class="kv"><span>Podstawa ZUS</span><strong id="r-pzus">0,00 zł</strong></div>
+        <div class="kv"><span>Podstawa składki zdrow.</span><strong id="r-pzd">0,00 zł</strong></div>
+        <div class="kv"><span>Podstawa opodatkowania</span><strong id="r-podst">0,00 zł</strong></div>
+        <div class="kv"><span>Zaliczka na PIT</span><strong id="r-pit">0,00 zł</strong></div>
+        <div class="kv"><span><strong>NA RĘKĘ</strong></span><strong id="r-netto">0,00 zł</strong></div>
+      </div>
+    </div>
+  </div>
+
 <script>
-if(localStorage.getItem('accessGranted') !== 'true') {
-    window.location.href = 'paywall.html';
-}
-// Tu wstaw swój kod kalkulatora JS
+(() => {
+  // ======== STAŁE (jak w wersji Python) ========
+  const STAWKI_NOCNE_2025 = {"Styczeń":5.55,"Luty":5.83,"Marzec":5.55,"Kwiecień":5.55,"Maj":5.83,"Czerwiec":5.83,"Lipiec":5.07,"Sierpień":5.83,"Wrzesień":5.30,"Październik":5.07,"Listopad":6.48,"Grudzień":5.83};
+
+  // UoP
+  const SKLADKA_EMERYTALNA_UOP = 0.0976;
+  const SKLADKA_RENTOWA_UOP = 0.0150;
+  const SKLADKA_CHOROBOWA_UOP = 0.0245;
+  const SUMA_SKLADEK_SPOLECZNYCH_UOP = SKLADKA_EMERYTALNA_UOP + SKLADKA_RENTOWA_UOP + SKLADKA_CHOROBOWA_UOP; // 0.1371
+  const KUP_MIESIECZNIE_UOP = 250.00;
+  const WSPOLCZYNNIK_URLOPOWY_2025 = 20.75;
+  const SKLADKA_ZDROWOTNA_PROCENT = 0.09;
+  const STAWKA_PIT = 0.12;
+  const PPK_PRACOWNIK_STAWKA = 0.02;
+  const KWOTA_ZMNIEJSZAJACA_MIESIECZNIE = 300.00;
+  const STAWKA_WYNAGRODZENIA_CHOROBOWEGO = 0.80;
+
+  // Zlecenie
+  const SKLADKA_EMERYTALNA_ZLEC = 0.0976;
+  const SKLADKA_RENTOWA_ZLEC = 0.0150;
+  const SKLADKA_CHOROBOWA_ZLEC_DOBROWOLNA = 0.0245;
+  const KUP_ZLECENIE_PROCENT = 0.20;
+
+  // ======== UTIL ========
+  const PLN = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmt = n => PLN.format(n) + ' zł';
+  const pfloat = (v, f=0) => { if(v==null) return f; const s=String(v).replace(/\s+/g,'').replace(',','.').trim(); if(!s) return f; const n=Number(s); return Number.isFinite(n)?n:f; };
+  const pint = (v) => Math.trunc(pfloat(v,0));
+  const floorPL = (n) => Math.floor(n);
+
+  // ======== BUDOWA UI ========
+  const paneU = document.getElementById('pane-uop');
+  const paneZ = document.getElementById('pane-zlec');
+
+  function el(tag, attrs={}, ...kids){
+    const e=document.createElement(tag);
+    for(const [k,v] of Object.entries(attrs)){
+      if(k==='class') e.className=v; else if(k==='for') e.htmlFor=v; else if(k.startsWith('on')&&typeof v==='function') e.addEventListener(k.slice(2), v); else if(v!==false && v!=null) e.setAttribute(k, v===true?'':v);
+    }
+    for(const ch of kids.flat()) e.appendChild(ch?.nodeType? ch : document.createTextNode(String(ch)));
+    return e;
+  }
+  function inputRow(label, input){ return el('div',{class:'row'}, el('label',{}, label), input); }
+
+  // ---- UoP form ----
+  const miesiac = el('select',{}, ...Object.keys(STAWKI_NOCNE_2025).map(m=>el('option',{value:m, ...(m==='Lipiec'?{selected:true}:{})}, m)));
+  const nocBadge = el('span',{class:'badge'});
+  function updNoc(){ nocBadge.textContent = 'Dodatek: ' + String(PLN.format(STAWKI_NOCNE_2025[miesiac.value])).replace(' zł',' zł/h'); }
+  miesiac.addEventListener('change', updNoc); updNoc();
+
+  const trybU_g = el('input',{type:'radio',name:'trybU',value:'godzinowa',checked:true});
+  const trybU_m = el('input',{type:'radio',name:'trybU',value:'miesieczna'});
+  let lblStawka = el('label',{}, 'Stawka godzinowa brutto (zł):');
+  const inpStawka = el('input',{type:'text',placeholder:'np. 28,50'});
+  const obliczona = el('div',{class:'hint',style:'display:none'}, 'Obliczona stawka godzinowa: ', el('strong',{id:'uStawka'},'0,00 zł/h'));
+  function syncUoP(){ if(trybU_g.checked){lblStawka.textContent='Stawka godzinowa brutto (zł):'; obliczona.style.display='none';} else {lblStawka.textContent='Miesięczna kwota brutto (zł):'; obliczona.style.display='block';} }
+  trybU_g.addEventListener('change', syncUoP); trybU_m.addEventListener('change', syncUoP);
+
+  const dl8=el('input',{type:'radio',name:'dlZ',value:'8',checked:true});
+  const dl10=el('input',{type:'radio',name:'dlZ',value:'10'});
+  const dl12=el('input',{type:'radio',name:'dlZ',value:'12'});
+
+  const fieldsUlabels=[
+    'Ilość zmian dziennych:','Ilość zmian nocnych:','Dni na L4 (80%):','Premia brutto (zł):',
+    'Nadgodziny dzienne (+50%):','Nadgodziny nocne (+50%):','Nadgodziny nocne w niedzielę (+100%):','Niewykorzystane dni urlopu:'
+  ];
+  const fieldsU={};
+  fieldsUlabels.forEach(lbl=>fieldsU[lbl]=el('input',{type:'text',value:'0'}));
+
+  const ulgiDar=el('input',{type:'text',value:'0'});
+  const ulgiInt=el('input',{type:'text',value:'0'});
+  const ulgiDzie=el('input',{type:'text',value:'0'});
+  const chkSenior=el('input',{type:'checkbox'});
+  const chk4plus=el('input',{type:'checkbox'});
+  const chkPit0=el('input',{type:'checkbox'});
+  const chkPPK=el('input',{type:'checkbox'});
+
+  paneU.append(
+    el('div',{class:'grid'},
+      el('div',{},
+        el('div',{class:'row'}, el('label',{}, 'Miesiąc rozliczenia:'), el('div',{}, miesiac, ' ', nocBadge)),
+        el('div',{class:'row'}, el('label',{}, 'Tryb rozliczenia:'), el('div',{class:'radios'}, el('label',{}, trybU_g,' Stawka godzinowa'), el('label',{}, trybU_m,' Kwota brutto (mies.)'))),
+        obliczona,
+        inputRow('', el('div',{}, lblStawka, inpStawka)),
+        inputRow('Długość zmiany:', el('div',{class:'radios'}, el('label',{}, dl8,' 8h'), el('label',{}, dl10,' 10h'), el('label',{}, dl12,' 12h'))),
+        ...fieldsUlabels.map(lbl=>inputRow(lbl, fieldsU[lbl]))
+      ),
+      el('div',{},
+        el('div',{class:'card'},
+          el('div',{style:'font-weight:700;margin-bottom:8px'}, 'Ulgi i odliczenia'),
+          inputRow('Darowizny (kwota mies.)', ulgiDar),
+          inputRow('Ulga na internet (kwota mies.)', ulgiInt),
+          inputRow('Ulga na dziecko (kwota mies.)', ulgiDzie),
+          el('div',{class:'row'}, el('label',{}, 'Dodatkowe ulgi:'), el('div',{class:'checks'},
+            el('label',{}, chkSenior,' Ulga dla pracujących seniorów'),
+            el('label',{}, chk4plus,' Ulga dla rodzin 4+'),
+            el('label',{}, chkPit0,' PIT‑0 poniżej 26 lat'),
+            el('label',{}, chkPPK,' Uczestniczę w PPK (2%)')
+          ))
+        )
+      )
+    )
+  );
+
+  // ---- Zlecenie form ----
+  const zTrybG=el('input',{type:'radio',name:'tz',value:'godzinowa',checked:true});
+  const zTrybM=el('input',{type:'radio',name:'tz',value:'miesieczna'});
+  let zLbl=el('label',{}, 'Stawka godzinowa brutto (zł):');
+  const zInp=el('input',{type:'text',placeholder:'np. 28,50'});
+  function syncZ(){ zLbl.textContent = zTrybG.checked? 'Stawka godzinowa brutto (zł):' : 'Miesięczna kwota brutto (zł):'; }
+  zTrybG.addEventListener('change', syncZ); zTrybM.addEventListener('change', syncZ);
+
+  const zIlZm=el('input',{type:'text',value:'0'});
+  const zDl8=el('input',{type:'radio',name:'zdl',value:'8',checked:true});
+  const zDl10=el('input',{type:'radio',name:'zdl',value:'10'});
+  const zDl12=el('input',{type:'radio',name:'zdl',value:'12'});
+
+  const zChkStudent=el('input',{type:'checkbox'});
+  const zChkPit0=el('input',{type:'checkbox'});
+  const zChkChorDob=el('input',{type:'checkbox'});
+  const zChkPit2=el('input',{type:'checkbox',checked:true});
+
+  const zObl = el('div',{class:'hint',style:'display:none'}, 'Obliczona stawka godzinowa: ', el('strong',{id:'zSt'},'0,00 zł/h'));
+
+  paneZ.append(
+    el('div',{class:'grid'},
+      el('div',{},
+        el('div',{class:'row'}, el('label',{}, 'Tryb rozliczenia:'), el('div',{class:'radios'}, el('label',{}, zTrybG,' Stawka godzinowa'), el('label',{}, zTrybM,' Kwota brutto (mies.)'))),
+        zObl,
+        inputRow('', el('div',{}, zLbl, zInp)),
+        el('div',{class:'row'}, el('label',{}, 'Ilość zmian w miesiącu:'), zIlZm),
+        inputRow('Długość zmiany:', el('div',{class:'radios'}, el('label',{}, zDl8,' 8h'), el('label',{}, zDl10,' 10h'), el('label',{}, zDl12,' 12h')))
+      ),
+      el('div',{},
+        el('div',{class:'card'},
+          el('div',{style:'font-weight:700;margin-bottom:8px'}, 'Opcje'),
+          el('div',{class:'checks'},
+            el('label',{}, zChkStudent,' Jestem studentem/uczniem do 26 r.ż.'),
+            el('label',{}, zChkPit0,' PIT‑0 (nie jestem studentem)'),
+            el('label',{}, zChkChorDob,' Dobrowolna składka chorobowa (2.45%)'),
+            el('label',{}, zChkPit2,' Zastosuj kwotę zmniejszającą (PIT-2)')
+          )
+        )
+      )
+    )
+  );
+
+  // ======== OBLICZENIA ========
+  function calcUoP(){
+    const godzinyNaZmianie = pint(document.querySelector('input[name="dlZ"]:checked').value);
+    const zmDz = pint(fieldsU['Ilość zmian dziennych:'].value);
+    const zmNc = pint(fieldsU['Ilość zmian nocnych:'].value);
+    const dniL4 = pint(fieldsU['Dni na L4 (80%):'].value);
+    const premia = pfloat(fieldsU['Premia brutto (zł):'].value);
+    const ngDz = pint(fieldsU['Nadgodziny dzienne (+50%):'].value);
+    const ngNc = pint(fieldsU['Nadgodziny nocne (+50%):'].value);
+    const ngNcNd = pint(fieldsU['Nadgodziny nocne w niedzielę (+100%):'].value);
+    const urlopDni = pint(fieldsU['Niewykorzystane dni urlopu:'].value);
+
+    let stawkaGodz = 0, wynPodst = 0, miesiecznaBruttoUm = 0;
+
+    if (trybU_g.checked){
+      stawkaGodz = pfloat(inpStawka.value);
+      wynPodst = (zmDz + zmNc) * godzinyNaZmianie * stawkaGodz;
+      miesiecznaBruttoUm = wynPodst;
+    } else {
+      const kwBr = pfloat(inpStawka.value);
+      wynPodst = kwBr; miesiecznaBruttoUm = kwBr;
+      const standardowe = (zmDz + zmNc) * godzinyNaZmianie;
+      const box = document.getElementById('uStawka').parentElement; // obliczona
+      if (standardowe > 0){
+        stawkaGodz = kwBr / standardowe;
+        document.getElementById('uStawka').textContent = PLN.format(stawkaGodz) + ' zł/h';
+        box.style.display='block';
+      } else {
+        box.style.display='block';
+        document.getElementById('uStawka').textContent = 'Wpisz liczbę zmian!';
+      }
+    }
+
+    const dodatekNoc = (zmNc * godzinyNaZmianie) * (STAWKI_NOCNE_2025[miesiac.value]||0);
+    const wynNG = (ngDz * stawkaGodz * 1.5) + (ngNc * stawkaGodz * 1.5) + (ngNcNd * stawkaGodz * 2.0);
+    const wynZaPrace = wynPodst + premia + dodatekNoc + wynNG;
+
+    const ekwiwalent = (urlopDni > 0 && wynZaPrace > 0) ? (wynZaPrace / WSPOLCZYNNIK_URLOPOWY_2025) * urlopDni : 0;
+    const podstSpo = wynZaPrace + ekwiwalent;
+
+    const wynChor = (dniL4 > 0 && miesiecznaBruttoUm > 0)
+      ? (((miesiecznaBruttoUm * (1 - SUMA_SKLADEK_SPOLECZNYCH_UOP)) / 30) * dniL4 * STAWKA_WYNAGRODZENIA_CHOROBOWEGO)
+      : 0;
+
+    const bruttoUoP = podstSpo + wynChor;
+
+    const sklEm = podstSpo * SKLADKA_EMERYTALNA_UOP;
+    const sklRe = podstSpo * SKLADKA_RENTOWA_UOP;
+    const sklCh = podstSpo * SKLADKA_CHOROBOWA_UOP;
+    const sumaSp = sklEm + sklRe + sklCh;
+
+    const podstZdrow = (podstSpo - sumaSp) + wynChor;
+    const sklZdrow = podstZdrow * SKLADKA_ZDROWOTNA_PROCENT;
+
+    const ppk = chkPPK.checked ? (bruttoUoP * PPK_PRACOWNIK_STAWKA) : 0;
+
+    const ulgiOdDoch = pfloat(ulgiDar.value) + pfloat(ulgiInt.value);
+    const podstOpPrzed = bruttoUoP - sumaSp - KUP_MIESIECZNIE_UOP - ulgiOdDoch;
+    const podstOp = podstOpPrzed > 0 ? floorPL(podstOpPrzed) : 0;
+
+    let zaliczka = 0;
+    if (!(chkPit0.checked || chkSenior.checked || chk4plus.checked)){
+      let podatek = (podstOp * STAWKA_PIT) - KWOTA_ZMNIEJSZAJACA_MIESIECZNIE;
+      podatek -= pfloat(ulgiDzie.value);
+      zaliczka = podatek > 0 ? floorPL(podatek) : 0;
+    }
+
+    const sumaPotr = sumaSp + sklZdrow + zaliczka + ppk;
+    const netto = bruttoUoP - sumaPotr;
+
+    return {
+      em: sklEm, re: sklRe, ch: sklCh, ppk: ppk, zd: sklZdrow, sum: sumaPotr,
+      brutto: bruttoUoP, pzus: podstSpo, pzd: podstZdrow, podst: podstOpPrzed, pit: zaliczka, netto
+    };
+  }
+
+  function calcZlecenie(){
+    const godz = (()=>{ const v=document.querySelector('input[name="zdl"]:checked').value; return pint(v); })();
+    const ilZm = pint(zIlZm.value);
+    const allH = ilZm * godz;
+
+    let brutto = 0;
+    if (zTrybG.checked){
+      brutto = pfloat(zInp.value) * allH;
+    } else {
+      brutto = pfloat(zInp.value);
+      const box=zObl; box.style.display='block';
+      if (allH>0) box.querySelector('strong').textContent = PLN.format(brutto/allH) + ' zł/h';
+      else box.querySelector('strong').textContent = 'Wpisz liczbę zmian!';
+    }
+    if (brutto === 0){
+      return {em:0,re:0,ch:0,zd:0,sum:0,brutto:0,pzus:0,pzd:0,podst:0,pit:0,netto:0};
+    }
+
+    if (zChkStudent.checked){
+      return {em:0,re:0,ch:0,zd:0,sum:0,brutto:brutto,pzus:0,pzd:0,podst:0,pit:0,netto:brutto};
+    }
+
+    const podstZUS = brutto;
+    const sklEm = podstZUS * SKLADKA_EMERYTALNA_ZLEC;
+    const sklRe = podstZUS * SKLADKA_RENTOWA_ZLEC;
+    const sklCh = zChkChorDob.checked ? podstZUS * SKLADKA_CHOROBOWA_ZLEC_DOBROWOLNA : 0;
+    const sumaSp = sklEm + sklRe + sklCh;
+
+    const podstZdrow = brutto - sumaSp;
+    const sklZdrow = podstZdrow * SKLADKA_ZDROWOTNA_PROCENT;
+
+    let zaliczka = 0, podstOpPrzed = 0;
+    if (!zChkPit0.checked){
+      const KUP = (brutto - sumaSp) * KUP_ZLECENIE_PROCENT;
+      podstOpPrzed = brutto - sumaSp - KUP;
+      const podstOp = podstOpPrzed > 0 ? floorPL(podstOpPrzed) : 0;
+      let podatek = podstOp * STAWKA_PIT;
+      if (zChkPit2.checked) podatek -= KWOTA_ZMNIEJSZAJACA_MIESIECZNIE;
+      zaliczka = podatek > 0 ? floorPL(podatek) : 0;
+    }
+
+    const sumaPotr = sumaSp + sklZdrow + zaliczka;
+    const netto = brutto - sumaPotr;
+
+    return {em:sklEm, re:sklRe, ch:sklCh, zd:sklZdrow, sum:sumaPotr, brutto, pzus:podstZUS, pzd:podstZdrow, podst:podstOpPrzed, pit:zaliczka, netto};
+  }
+
+  // ======== ZDARZENIA ========
+  document.getElementById('tab-uop').addEventListener('click', ()=>{
+    document.getElementById('tab-uop').classList.add('active');
+    document.getElementById('tab-zlec').classList.remove('active');
+    paneU.style.display='block'; paneZ.style.display='none';
+  });
+  document.getElementById('tab-zlec').addEventListener('click', ()=>{
+    document.getElementById('tab-zlec').classList.add('active');
+    document.getElementById('tab-uop').classList.remove('active');
+    paneZ.style.display='block'; paneU.style.display='none';
+  });
+
+  document.getElementById('btn-calc').addEventListener('click', ()=>{
+    const uopActive = document.getElementById('tab-uop').classList.contains('active');
+    const res = uopActive ? calcUoP() : calcZlecenie();
+    const set = (id, v) => document.getElementById(id).textContent = fmt(v);
+    set('r-em', res.em); set('r-re', res.re); set('r-ch', res.ch); set('r-ppk', res.ppk||0); set('r-zd', res.zd); set('r-sum', res.sum);
+    set('r-brutto', res.brutto); set('r-pzus', res.pzus); set('r-pzd', res.pzd); set('r-podst', res.podst); set('r-pit', res.pit); set('r-netto', res.netto);
+  });
+})();
 </script>
-</main>
 </body>
 </html>
