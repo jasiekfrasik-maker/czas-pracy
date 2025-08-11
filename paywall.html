@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odblokuj kalkulator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h2>Podaj kod dostępu</h2>
+<input type="password" id="accessCode" placeholder="Wpisz kod">
+<button onclick="checkCode()">Odblokuj</button>
+<p id="error" style="color:red; display:none;">Nieprawidłowy kod</p>
+</main>
+<script>
+function checkCode() {
+    const code = document.getElementById('accessCode').value;
+    if(code === 'VIP2025') {
+        localStorage.setItem('accessGranted', 'true');
+        window.location.href = 'kalkulator.html';
+    } else {
+        document.getElementById('error').style.display = 'block';
+    }
+}
+</script>
+</body>
+</html>
